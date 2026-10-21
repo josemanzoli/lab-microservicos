@@ -2,6 +2,25 @@
 
 Laboratório de **Arquitetura de Microsserviços** com um e-commerce de ponta a ponta que demonstra, na prática, como sistemas distribuídos funcionam no mercado atual: comunicação síncrona e assíncrona, **API Gateway**, **Database-per-Service**, **Outbox**, **Saga/compensação**, **Circuit Breaker**, **idempotência** e **observabilidade** (logs, métricas e tracing).
 
+## Conceitos cobertos
+
+- **Microservicos**: catalog, cart, order, payment, invoice, logistics, warranty, messaging-demo. Alta coesão e baixo acoplamento.
+- **API Gateway** (Nginx): roteamento `/api/v1/*`, rate limit, `X-Correlation-ID`
+- **Database-per-Service**: 7 databases num PostgreSQL
+- **Comunicação síncrona** (HTTP) vs **assíncrona** (eventos no RabbitMQ topic)
+- **Circuit Breaker + timeout** entre serviços (`lab_common.http_client`)
+- **Outbox Pattern**: publicação de eventos transacional (at-least-once)
+- **Saga / compensação**: reserva de estoque + `order.rejected` cancelando logística/garantia
+- **Idempotência durável** (constraints UNIQUE + upsert)
+- **Validação de contrato** (marshmallow/apiflask) e **versionamento** de API
+- **Observabilidade**: logs (Loki), métricas (Prometheus), tracing distribuído (Tempo) com **correlation ID** e **W3C Trace Context** de ponta a ponta
+- **Docker**: imagens, rede, volumes, dependências.
+- **Docker Compose**: configuração, dependências, rede.
+- **PostgreSQL**: criação de schemas, constraints UNIQUE + upsert
+- **RabbitMQ**: topic, work queue, DLQ
+- **Grafana**: dashboards, métricas, logs, traces
+- **Prometheus**: métricas, rate limit, circuit breaker
+
 ## Arquitetura
 
 ```mermaid
@@ -106,18 +125,6 @@ Se só quiser recriar os databases sem apagar o volume: `./scripts/reset_db.sh`.
 ./scripts/load_orders.sh 50 # carga de 50 pedidos (observa métricas/DLQ)
 ./scripts/smoke_test.sh     # valida endpoints em poucos segundos
 ```
-
-## Conceitos cobertos
-
-- **API Gateway** (Nginx): roteamento `/api/v1/*`, rate limit, `X-Correlation-ID`
-- **Database-per-Service**: 7 databases num PostgreSQL
-- **Comunicação síncrona** (HTTP) vs **assíncrona** (eventos no RabbitMQ topic)
-- **Circuit Breaker + timeout** entre serviços (`lab_common.http_client`)
-- **Outbox Pattern**: publicação de eventos transacional (at-least-once)
-- **Saga / compensação**: reserva de estoque + `order.rejected` cancelando logística/garantia
-- **Idempotência durável** (constraints UNIQUE + upsert)
-- **Validação de contrato** (marshmallow/apiflask) e **versionamento** de API
-- **Observabilidade**: logs (Loki), métricas (Prometheus), tracing distribuído (Tempo) com **correlation ID** e **W3C Trace Context** de ponta a ponta
 
 ## Estrutura
 
