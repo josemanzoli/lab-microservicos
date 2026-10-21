@@ -33,6 +33,7 @@ app.register_blueprint(make_health_blueprint(check_db=check_db))
 @app.get('/carts/<cid>')
 def get_cart(cid):
     REQUEST_COUNT.labels(method='GET', endpoint='/carts/:id').inc()
+    logger.info('Cart queried', extra={'cartId': cid})
     s = SessionLocal()
     items = s.query(CartItem).filter(CartItem.cart_id == cid).all()
     total = sum(float(i.price)*i.quantity for i in items)
@@ -46,6 +47,7 @@ def add_item(cid, json_data):
     REQUEST_COUNT.labels(method='POST', endpoint='/carts/:id/items').inc()
     pid = json_data.get('productId')
     qty = int(json_data.get('quantity', 1))
+    logger.info('Validating product in catalog', extra={'cartId': cid, 'productId': pid})
     try:
         r = hc.call(f'{CATALOG_URL}/products/{pid}', method='GET', timeout=2)
         prod = r.json()

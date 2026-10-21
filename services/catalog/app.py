@@ -56,6 +56,7 @@ app.register_blueprint(make_health_blueprint(check_db=check_db))
 @app.get('/products')
 def list_products():
     REQUEST_COUNT.labels(method='GET', endpoint='/products').inc()
+    logger.info('Catalog listed')
     s = SessionLocal()
     items = s.query(Product).order_by(Product.id).all()
     res = [to_dict(p) for p in items]
@@ -66,6 +67,7 @@ def list_products():
 @app.get('/products/<int:pid>')
 def get_product(pid):
     REQUEST_COUNT.labels(method='GET', endpoint='/products/:id').inc()
+    logger.info('Product fetched', extra={'productId': pid})
     s = SessionLocal()
     p = s.query(Product).filter(Product.id == pid).first()
     if not p:

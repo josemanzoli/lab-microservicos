@@ -13,6 +13,7 @@ x-app-env: &app-env
   ENV: ${ENV:-development}
   HTTP_CALL_LATENCY_MS: ${HTTP_CALL_LATENCY_MS:-20}
   SERVICE_PROCESSING_LATENCY_MS: ${SERVICE_PROCESSING_LATENCY_MS:-10}
+  CONSUME_DELAY_MS: ${CONSUME_DELAY_MS:-10}
 
 x-app-defaults: &app-defaults
   restart: on-failure
@@ -264,6 +265,7 @@ services:
       POSTGRES_DB: invoice_db
       RABBITMQ_HOST: rabbitmq
       INVOICE_FAIL_RATE: ${INVOICE_FAIL_RATE:-0.0}
+      CONSUME_DELAY_MS: ${CONSUME_DELAY_MS:-10}
 
   logistics-worker:
     <<: *app-defaults
@@ -279,6 +281,7 @@ services:
       <<: *app-env
       POSTGRES_DB: logistics_db
       RABBITMQ_HOST: rabbitmq
+      CONSUME_DELAY_MS: ${LOGISTICS_CONSUME_DELAY_MS:-20}
 
   warranty-worker:
     <<: *app-defaults
@@ -297,6 +300,7 @@ services:
       POSTGRES_DB: warranty_db
       RABBITMQ_HOST: rabbitmq
       CATALOG_URL: http://catalog:5000
+      CONSUME_DELAY_MS: ${WARRANTY_CONSUME_DELAY_MS:-30}
 
 volumes:
   grafana-data:

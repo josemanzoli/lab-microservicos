@@ -1,3 +1,4 @@
+import os
 import time
 import json
 import random
@@ -6,12 +7,20 @@ from opentelemetry import propagate
 from prometheus_client import start_http_server, Counter
 from .logger import setup_logger
 from .rabbitmq import rabbitmq_service
+from .correlation import set_correlation_id
 from .tracing import init_tracing, get_tracer
+
+# Delay simulado antes de começar a consumir a mensagem (ms): cria uma separação
+# visível nos logs entre o "Outbox event published" (relay do order) e o
+# "Message received" (worker), evidenciando o padrão outbox.
+CONSUME_DELAY_MS = float(os.getenv('CONSUME_DELAY_MS', '10'))
 
 
 def _make_callback(service_name, handler, logger, tracer, processed_cache,
                    PROCESSED, ERRORS, max_retries, initial_delay, simulate_fail_rate):
     def callback(ch, method, properties, body):
+        if CONSUME_DELAY_MS > 0:
+            time.sleep(CONSUME_DELAY_MS / 1000.0)
         start_time = time.time()
         context = propagate.extract(properties.headers or {})
         with tracer.start_as_current_span(f"rabbitmq_consume_{service_name}", context=context) as span:
@@ -20,6 +29,9 @@ def _make_callback(service_name, handler, logger, tracer, processed_cache,
                 data = json.loads(decoded)
                 correlation_id = properties.correlation_id or data.get('correlationId') or data.get('correlation_id') or data.get('orderId')
                 span.set_attribute("messaging.correlation_id", correlation_id or "unknown")
+                # Propaga o ID de negócio para chamadas HTTP que o handler fizer
+                # (ex.: warranty → catalog), mantendo TUDO no mesmo correlationId.
+                set_correlation_id(correlation_id)
 
                 if correlation_id in processed_cache:
                     logger.warning("Idempotency: duplicate dropped.", extra={"correlationId": correlation_id})

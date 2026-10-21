@@ -19,6 +19,7 @@ ORDER=$(curl -s -X POST "$GW/api/v1/pedidos/orders" -H "Content-Type: applicatio
 echo "  $ORDER"
 ORDER_ID=$(echo "$ORDER" | python3 -c "import sys,json; print(json.load(sys.stdin).get('orderId',''))")
 STATUS=$(echo "$ORDER" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))")
+REASON=$(echo "$ORDER" | python3 -c "import sys,json; print(json.load(sys.stdin).get('reason',''))")
 
 if [ "$STATUS" = "PAID" ]; then
   echo "==> 5. Aguardando workers assíncronos (NF, logística, garantia)..."
@@ -32,7 +33,8 @@ if [ "$STATUS" = "PAID" ]; then
   echo "  Estoque do produto 1 (deve ter decrementado):"
   docker compose exec -T postgres psql -U admin -d catalog_db -c "SELECT id, stock FROM products WHERE id=1;" 2>/dev/null || true
 else
-  echo "  Pedido REJECTED (pagamento falhou) — rode novamente ou ajuste PAYMENT_FAILURE_RATE."
+  echo "  Pedido REJECTED — motivo: $REASON"
+  echo "  Dica: se for estoque, reponha via PUT /api/v1/catalogo/products/<id>; se for pagamento, ajuste PAYMENT_FAILURE_RATE."
 fi
 
 echo "==> Concluído. Abra o Grafana (http://localhost:3000) → Tempo para ver o trace completo."

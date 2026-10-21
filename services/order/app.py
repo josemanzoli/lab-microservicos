@@ -154,6 +154,7 @@ def outbox_relay(stop_event):
 def create_order(json_data):
     REQUEST_COUNT.labels(method='POST', endpoint='/orders').inc()
     cart_id = json_data.get('cartId')
+    logger.info('Checkout started — reading cart', extra={'cartId': cart_id})
     try:
         r = hc.call(f'{CART_URL}/carts/{cart_id}', method='GET', timeout=2)
         cart = r.json()
@@ -165,6 +166,7 @@ def create_order(json_data):
     correlation_id = get_correlation_id()
 
     # 1. Reserva de estoque (antes do pagamento) — parte da saga
+    logger.info('Reserving stock for order', extra={'orderId': order_id, 'items': len(items)})
     try:
         _reserve_stock(items)
     except Exception as e:
@@ -176,6 +178,7 @@ def create_order(json_data):
     s.commit()
 
     # 2. Pagamento
+    logger.info('Processing payment for order', extra={'orderId': order_id, 'amount': float(total)})
     try:
         r2 = hc.call(f'{PAYMENT_URL}/payments', method='POST',
                      json={'orderId': order_id, 'amount': int(total)}, timeout=3)
