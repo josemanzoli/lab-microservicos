@@ -11,6 +11,8 @@ x-app-env: &app-env
   POSTGRES_HOST: postgres
   TEMPO_ENDPOINT: ${TEMPO_ENDPOINT:-http://tempo:4317}
   ENV: ${ENV:-development}
+  HTTP_CALL_LATENCY_MS: ${HTTP_CALL_LATENCY_MS:-20}
+  SERVICE_PROCESSING_LATENCY_MS: ${SERVICE_PROCESSING_LATENCY_MS:-10}
 
 x-app-defaults: &app-defaults
   restart: on-failure

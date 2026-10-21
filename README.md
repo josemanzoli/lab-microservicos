@@ -149,6 +149,8 @@ As variáveis de simulação ficam no `.env` (12-factor):
 |---|---|---|
 | `PAYMENT_FAILURE_RATE` | `0.2` | Probabilidade do pagamento ser recusado |
 | `PAYMENT_LATENCY_MS` | `0` | Latência artificial do pagamento (ms) |
+| `HTTP_CALL_LATENCY_MS` | `20` | Latência de rede simulada entre serviços (por chamada HTTP) |
+| `SERVICE_PROCESSING_LATENCY_MS` | `10` | Latência de processamento simulada por requisição |
 | `INVOICE_FAIL_RATE` | `0.0` | Probabilidade de falha do invoice (→ DLQ) |
 
 ## CI

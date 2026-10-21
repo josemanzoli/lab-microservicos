@@ -1,7 +1,13 @@
+import os
+import time
 import uuid
 from contextvars import ContextVar
 from flask import request, g
 from opentelemetry import trace
+
+# Latência de processamento simulada por requisição (ms): cada serviço demora
+# um pouco para atender, escalonando no tempo os logs do fluxo síncrono.
+SERVICE_PROCESSING_LATENCY_MS = float(os.getenv('SERVICE_PROCESSING_LATENCY_MS', '10'))
 
 # Correlation ID de negócio: começa no gateway (X-Correlation-ID) e é
 # propagado através de chamadas HTTP (via lab_common.http_client) e mensagens.
@@ -24,6 +30,8 @@ def correlation_middleware(app):
 
     @app.before_request
     def _before_request():
+        if SERVICE_PROCESSING_LATENCY_MS > 0:
+            time.sleep(SERVICE_PROCESSING_LATENCY_MS / 1000.0)
         cid = (
             request.headers.get('X-Correlation-ID')
             or request.headers.get('X-Request-ID')

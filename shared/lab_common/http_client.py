@@ -1,8 +1,15 @@
+import os
+import time
 from urllib.parse import urlparse
 import pybreaker
 import requests
 from opentelemetry import propagate
 from .correlation import get_correlation_id
+
+# Latência de rede simulada entre serviços (ms) — espalha no tempo os logs do
+# fluxo síncrono (gateway → order → cart → catalog → payment), refletindo a
+# ordem real de um pedido em produção.
+HTTP_CALL_LATENCY_MS = float(os.getenv('HTTP_CALL_LATENCY_MS', '20'))
 
 
 class HttpClient:
@@ -33,6 +40,8 @@ class HttpClient:
 
         @breaker
         def _do():
+            if HTTP_CALL_LATENCY_MS > 0:
+                time.sleep(HTTP_CALL_LATENCY_MS / 1000.0)
             headers = {}
             # Injeta o contexto de tracing (W3C Trace Context) nos headers,
             # permitindo que o trace atravesse as chamadas HTTP entre serviços.
