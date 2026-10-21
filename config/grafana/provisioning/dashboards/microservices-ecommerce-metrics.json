@@ -1,0 +1,595 @@
+{
+    "annotations":  {
+                        "list":  [
+                                     {
+                                         "builtIn":  1,
+                                         "datasource":  "-- Grafana --",
+                                         "enable":  true,
+                                         "hide":  true,
+                                         "iconColor":  "rgba(0, 211, 255, 1)",
+                                         "name":  "Annotations \u0026 Alerts",
+                                         "type":  "dashboard"
+                                     }
+                                 ]
+                    },
+    "editable":  true,
+    "graphTooltip":  0,
+    "id":  null,
+    "links":  [
+
+              ],
+    "refresh":  "5s",
+    "schemaVersion":  39,
+    "tags":  [
+                 "ecommerce",
+                 "microservices"
+             ],
+    "time":  {
+                 "from":  "now-15m",
+                 "to":  "now"
+             },
+    "timezone":  "browser",
+    "title":  "E-commerce Microservices - Metrics",
+    "uid":  "ecommerce-microservices-metrics",
+    "version":  1,
+    "panels":  [
+                   {
+                       "collapsed":  false,
+                       "gridPos":  {
+                                       "h":  1,
+                                       "w":  24,
+                                       "x":  0,
+                                       "y":  0
+                                   },
+                       "id":  100,
+                       "panels":  [
+
+                                  ],
+                       "title":  "Fluxo de pedidos",
+                       "type":  "row"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  80,
+                                                                           "lineWidth":  0,
+                                                                           "showPoints":  "never",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.8,
+                                                                           "stacking":  {
+                                                                                            "mode":  "none",
+                                                                                            "group":  "A"
+                                                                                        }
+                                                                       },
+                                                            "mappings":  [
+
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "values":  [
+                                                                                              {
+                                                                                                  "color":  "green",
+                                                                                                  "value":  null
+                                                                                              }
+                                                                                          ]
+                                                                           },
+                                                            "unit":  "short",
+                                                            "decimals":  0
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  0,
+                                       "y":  1
+                                   },
+                       "id":  101,
+                       "options":  {
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (status) (increase(orders_created_total[1m])))",
+                                           "legendFormat":  "{{status}}",
+                                           "refId":  "A",
+                                           "interval":  "1m"
+                                       }
+                                   ],
+                       "title":  "Pedidos criados por status (contagem por minuto)",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  80,
+                                                                           "lineWidth":  0,
+                                                                           "showPoints":  "never",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.8,
+                                                                           "stacking":  {
+                                                                                            "mode":  "none",
+                                                                                            "group":  "A"
+                                                                                        }
+                                                                       },
+                                                            "mappings":  [
+
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "values":  [
+                                                                                              {
+                                                                                                  "color":  "green",
+                                                                                                  "value":  null
+                                                                                              }
+                                                                                          ]
+                                                                           },
+                                                            "unit":  "short",
+                                                            "decimals":  0
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  12,
+                                       "y":  1
+                                   },
+                       "id":  102,
+                       "options":  {
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (status) (increase(payments_total[1m])))",
+                                           "legendFormat":  "{{status}}",
+                                           "refId":  "A",
+                                           "interval":  "1m"
+                                       }
+                                   ],
+                       "title":  "Pagamentos por status (contagem por minuto)",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  80,
+                                                                           "lineWidth":  0,
+                                                                           "showPoints":  "never",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.8,
+                                                                           "stacking":  {
+                                                                                            "mode":  "none",
+                                                                                            "group":  "A"
+                                                                                        }
+                                                                       },
+                                                            "mappings":  [
+
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "values":  [
+                                                                                              {
+                                                                                                  "color":  "green",
+                                                                                                  "value":  null
+                                                                                              }
+                                                                                          ]
+                                                                           },
+                                                            "unit":  "short",
+                                                            "decimals":  0
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  0,
+                                       "y":  9
+                                   },
+                       "id":  103,
+                       "options":  {
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job, method, endpoint) (increase(http_requests_total[1m])))",
+                                           "legendFormat":  "{{job}} {{method}} {{endpoint}}",
+                                           "refId":  "A",
+                                           "interval":  "1m"
+                                       }
+                                   ],
+                       "title":  "Requisições HTTP por serviço (contagem por minuto)",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  80,
+                                                                           "lineWidth":  0,
+                                                                           "showPoints":  "never",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.8,
+                                                                           "stacking":  {
+                                                                                            "mode":  "none",
+                                                                                            "group":  "A"
+                                                                                        }
+                                                                       },
+                                                            "mappings":  [
+
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "values":  [
+                                                                                              {
+                                                                                                  "color":  "green",
+                                                                                                  "value":  null
+                                                                                              }
+                                                                                          ]
+                                                                           },
+                                                            "unit":  "short",
+                                                            "decimals":  0
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  12,
+                                       "y":  9
+                                   },
+                       "id":  104,
+                       "options":  {
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(invoice_processed_total[1m])))",
+                                           "legendFormat":  "invoice-worker",
+                                           "refId":  "A",
+                                           "interval":  "1m"
+                                       },
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(logistics_processed_total[1m])))",
+                                           "legendFormat":  "logistics-worker",
+                                           "refId":  "B",
+                                           "interval":  "1m"
+                                       },
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(warranty_processed_total[1m])))",
+                                           "legendFormat":  "warranty-worker",
+                                           "refId":  "C",
+                                           "interval":  "1m"
+                                       },
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(outbox_events_published_total[1m])))",
+                                           "legendFormat":  "outbox published",
+                                           "refId":  "D",
+                                           "interval":  "1m"
+                                       }
+                                   ],
+                       "title":  "Eventos assíncronos processados (contagem por minuto)",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "collapsed":  false,
+                       "gridPos":  {
+                                       "h":  1,
+                                       "w":  24,
+                                       "x":  0,
+                                       "y":  17
+                                   },
+                       "id":  110,
+                       "panels":  [
+
+                                  ],
+                       "title":  "Erros e resiliência",
+                       "type":  "row"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  80,
+                                                                           "lineWidth":  0,
+                                                                           "showPoints":  "never",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.8,
+                                                                           "stacking":  {
+                                                                                            "mode":  "none",
+                                                                                            "group":  "A"
+                                                                                        }
+                                                                       },
+                                                            "mappings":  [
+
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "values":  [
+                                                                                              {
+                                                                                                  "color":  "red",
+                                                                                                  "value":  1
+                                                                                              }
+                                                                                          ]
+                                                                           },
+                                                            "unit":  "short",
+                                                            "decimals":  0
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  24,
+                                       "x":  0,
+                                       "y":  18
+                                   },
+                       "id":  111,
+                       "options":  {
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(invoice_errors_total[1m])))",
+                                           "legendFormat":  "invoice errors",
+                                           "refId":  "A",
+                                           "interval":  "1m"
+                                       },
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(logistics_errors_total[1m])))",
+                                           "legendFormat":  "logistics errors",
+                                           "refId":  "B",
+                                           "interval":  "1m"
+                                       },
+                                       {
+                                           "datasource":  {
+                                                              "type":  "prometheus",
+                                                              "uid":  "prometheus"
+                                                          },
+                                           "expr":  "round(sum by (job) (increase(warranty_errors_total[1m])))",
+                                           "legendFormat":  "warranty errors",
+                                           "refId":  "C",
+                                           "interval":  "1m"
+                                       }
+                                   ],
+                       "title":  "Erros dos workers (DLQ) por minuto",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "collapsed":  false,
+                       "gridPos":  {
+                                       "h":  1,
+                                       "w":  24,
+                                       "x":  0,
+                                       "y":  26
+                                   },
+                       "id":  120,
+                       "panels":  [
+
+                                  ],
+                       "title":  "Distributed Tracing",
+                       "type":  "row"
+                   },
+                   {
+                       "gridPos":  {
+                                       "h":  7,
+                                       "w":  24,
+                                       "x":  0,
+                                       "y":  27
+                                   },
+                       "id":  121,
+                       "type":  "text",
+                       "options":  {
+                                       "mode":  "markdown",
+                                       "content":  "### Ver o trace completo de um pedido\n\n1. Gere pedidos: `./scripts/demo_flow.sh` ou `./scripts/load_orders.sh 10`\n2. Clique nos links abaixo (Explore → Tempo) e então na **Trace ID** para abrir a visão **waterfall** completa\n   - [Traces do POST /orders (order-service)](http://localhost:3000/explore?schemaVersion=1\u0026panes=%7B%22dy3%22%3A%20%7B%22datasource%22%3A%20%22tempo%22%2C%20%22queries%22%3A%20%5B%7B%22refId%22%3A%20%22A%22%2C%20%22queryType%22%3A%20%22traceql%22%2C%20%22query%22%3A%20%22%7B%20resource.service.name%20%3D%20%5C%22order-service%5C%22%20%26%26%20name%20%3D%20%5C%22POST%20/orders%5C%22%20%7D%22%2C%20%22datasource%22%3A%20%7B%22type%22%3A%20%22tempo%22%2C%20%22uid%22%3A%20%22tempo%22%7D%7D%5D%2C%20%22range%22%3A%20%7B%22from%22%3A%20%22now-60m%22%2C%20%22to%22%3A%20%22now%22%7D%7D%7D\u0026orgId=1)\n   - [Spans server de todos os serviços (fluxo completo)](http://localhost:3000/explore?schemaVersion=1\u0026panes=%7B%22dy3%22%3A%20%7B%22datasource%22%3A%20%22tempo%22%2C%20%22queries%22%3A%20%5B%7B%22refId%22%3A%20%22A%22%2C%20%22queryType%22%3A%20%22traceql%22%2C%20%22query%22%3A%20%22%7B%20resource.service.name%20%3D~%20%5C%22catalog-service%7Ccart-service%7Corder-service%7Cpayment-service%5C%22%20%26%26%20kind%20%3D%20server%20%7D%22%2C%20%22datasource%22%3A%20%7B%22type%22%3A%20%22tempo%22%2C%20%22uid%22%3A%20%22tempo%22%7D%7D%5D%2C%20%22range%22%3A%20%7B%22from%22%3A%20%22now-60m%22%2C%20%22to%22%3A%20%22now%22%7D%7D%7D\u0026orgId=1)\n   - [Todos os traces recentes](http://localhost:3000/explore?schemaVersion=1\u0026panes=%7B%22dy3%22%3A%20%7B%22datasource%22%3A%20%22tempo%22%2C%20%22queries%22%3A%20%5B%7B%22refId%22%3A%20%22A%22%2C%20%22queryType%22%3A%20%22traceql%22%2C%20%22query%22%3A%20%22%7B%7D%22%2C%20%22datasource%22%3A%20%7B%22type%22%3A%20%22tempo%22%2C%20%22uid%22%3A%20%22tempo%22%7D%7D%5D%2C%20%22range%22%3A%20%7B%22from%22%3A%20%22now-30m%22%2C%20%22to%22%3A%20%22now%22%7D%7D%7D\u0026orgId=1)\n\n**Log → Trace:** no Explore do Loki, expanda uma linha de log e clique em **\"Debug: View Technical Trace\"** (campo derivado `traceId`).\n\n**Span → Logs:** no waterfall do Tempo, o painel **\"Related logs\"** busca no Loki linhas com o mesmo `traceId`.\n\n\u003e O trace de um pedido conecta: `order → cart` (lê carrinho) → `catalog` (reserva estoque) → `payment` (pagamento) no mesmo traceId, via W3C Trace Context + X-Correlation-ID propagados pelo gateway."
+                                   },
+                       "title":  "Como ver o trace completo de um pedido"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "tempo",
+                                          "uid":  "tempo"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+
+                                                                       }
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "gridPos":  {
+                                       "h":  10,
+                                       "w":  12,
+                                       "x":  0,
+                                       "y":  34
+                                   },
+                       "id":  122,
+                       "options":  {
+
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "tempo",
+                                                              "uid":  "tempo"
+                                                          },
+                                           "queryType":  "traceql",
+                                           "query":  "{ resource.service.name = \"order-service\" \u0026\u0026 name = \"POST /orders\" }",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "title":  "Spans recentes — POST /orders (order-service)",
+                       "type":  "table"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "tempo",
+                                          "uid":  "tempo"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+
+                                                                       }
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "gridPos":  {
+                                       "h":  10,
+                                       "w":  12,
+                                       "x":  12,
+                                       "y":  34
+                                   },
+                       "id":  123,
+                       "options":  {
+
+                                   },
+                       "targets":  [
+                                       {
+                                           "datasource":  {
+                                                              "type":  "tempo",
+                                                              "uid":  "tempo"
+                                                          },
+                                           "queryType":  "traceql",
+                                           "query":  "{ resource.service.name =~ \"catalog-service|cart-service|order-service|payment-service\" \u0026\u0026 kind = server }",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "title":  "Spans server dos serviços (fluxo completo)",
+                       "type":  "table"
+                   }
+               ]
+}

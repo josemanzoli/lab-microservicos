@@ -18,7 +18,7 @@ datasources:
         filterByTraceID: false
         filterBySpanID: false
         customQuery: true
-        query: '{job="dockerlogs", is_app="true"} | json | traceId="${__span.traceId}" or correlationId="${__span.tags.correlationId}"'
+        query: '{job="dockerlogs", is_app="true"} | json | traceId="$${__trace.traceId}" or correlationId="$${__span.tags["messaging.correlation_id"]}"'
       serviceMap:
         datasourceUid: prometheus
       nodeGraph:
