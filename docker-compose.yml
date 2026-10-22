@@ -177,6 +177,7 @@ services:
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./docs/openapi:/usr/share/nginx/html/docs:ro
+      - ./docs/aula:/usr/share/nginx/html/aula:ro
     depends_on:
       - catalog
       - cart

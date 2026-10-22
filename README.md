@@ -4,6 +4,10 @@ Laboratório de **Arquitetura de Microsserviços** com um e-commerce de ponta a 
 
 ## Conceitos cobertos
 
+- **Docker**: imagens, rede, volumes, dependências.
+- **Docker Compose**: configuração, dependências, rede.
+- **PostgreSQL**: criação de schemas, constraints UNIQUE + upsert
+- **RabbitMQ**: topic, work queue, DLQ
 - **Microservicos**: catalog, cart, order, payment, invoice, logistics, warranty, messaging-demo. Alta coesão e baixo acoplamento.
 - **API Gateway** (Nginx): roteamento `/api/v1/*`, rate limit, `X-Correlation-ID`
 - **Database-per-Service**: 7 databases num PostgreSQL
@@ -14,12 +18,9 @@ Laboratório de **Arquitetura de Microsserviços** com um e-commerce de ponta a 
 - **Idempotência durável** (constraints UNIQUE + upsert)
 - **Validação de contrato** (marshmallow/apiflask) e **versionamento** de API
 - **Observabilidade**: logs (Loki), métricas (Prometheus), tracing distribuído (Tempo) com **correlation ID** e **W3C Trace Context** de ponta a ponta
-- **Docker**: imagens, rede, volumes, dependências.
-- **Docker Compose**: configuração, dependências, rede.
-- **PostgreSQL**: criação de schemas, constraints UNIQUE + upsert
-- **RabbitMQ**: topic, work queue, DLQ
 - **Grafana**: dashboards, métricas, logs, traces
 - **Prometheus**: métricas, rate limit, circuit breaker
+
 
 ## Arquitetura
 
