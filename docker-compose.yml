@@ -74,7 +74,7 @@ services:
     image: postgres:15-alpine
     container_name: postgres
     ports:
-      - "5432:5432"
+      - "54323:54323"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-passw123}
