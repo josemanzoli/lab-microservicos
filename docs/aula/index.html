@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Jornada de um Pedido — Microsserviços na Prática</title>
+<script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --muted: #5b6472;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --line: #e5e8f0;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+    --code-file: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 60%, #7c3aed 100%);
+    color: #fff;
+    padding: 64px 24px 72px;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.6rem; margin: 0 0 8px; letter-spacing: -0.5px; }
+  .hero p { font-size: 1.2rem; margin: 0 auto; max-width: 760px; opacity: .92; }
+  .hero .badge {
+    display: inline-block; margin-top: 18px; padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,.4); border-radius: 999px; font-size: .85rem;
+  }
+  main { max-width: 1020px; margin: -36px auto 60px; padding: 0 20px; }
+  .part-title {
+    margin: 34px 0 14px; font-size: 1.35rem; color: var(--ink);
+    border-left: 4px solid var(--accent); padding-left: 12px;
+  }
+  .toc {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 24px; margin-bottom: 10px; box-shadow: 0 8px 24px rgba(31,36,48,.06);
+  }
+  .toc h2 { margin-top: 0; font-size: 1.1rem; }
+  .toc ol { columns: 2; column-gap: 32px; margin: 0; padding-left: 20px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  section.chapter {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 28px 30px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(31,36,48,.06);
+  }
+  .chapter h2 { margin: 0 0 4px; font-size: 1.5rem; }
+  .chapter .num {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    border-radius: 8px; padding: 2px 10px; font-size: .8rem; font-weight: 700;
+    margin-right: 8px; vertical-align: 4px; letter-spacing: .06em;
+  }
+  .chapter .sub { color: var(--muted); margin: 0 0 16px; font-size: .95rem; }
+  .chapter img { max-width: 100%; border-radius: 10px; border: 1px solid var(--line); margin: 12px 0; }
+  .chapter .fig { color: var(--muted); font-size: .82rem; margin: -8px 0 14px; }
+  .logos { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; margin: 14px 0; }
+  .logos img { height: 56px; margin: 0; border: none; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } .toc ol { columns: 1; } }
+  .card-inner {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .card-inner h4 { margin: 0 0 6px; font-size: .95rem; color: var(--accent); }
+  .card-inner p { margin: 0; font-size: .92rem; color: var(--muted); }
+  .cmp { width: 100%; border-collapse: collapse; margin: 6px 0 18px; font-size: .88rem; }
+  .cmp th { background: var(--accent-soft); color: var(--accent); text-align: left; padding: 10px 12px; border: 1px solid var(--line); }
+  .cmp td { padding: 10px 12px; border: 1px solid var(--line); vertical-align: top; }
+  .cmp td:first-child { font-weight: 600; }
+  .code-title {
+    display: block; font-size: .78rem; color: var(--code-file);
+    background: var(--code-bg); border-radius: 10px 10px 0 0; padding: 8px 18px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  pre.file {
+    background: var(--code-bg); color: var(--code-ink);
+    border-radius: 0 0 10px 10px; padding: 12px 18px 16px; overflow-x: auto;
+    font-size: .84rem; line-height: 1.55; margin: 0 0 18px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  pre.file .c { color: #64748b; }
+  pre.file .k { color: #c4b5fd; }
+  pre.file .s { color: #86efac; }
+  pre.file .n { color: #7dd3fc; }
+  code {
+    background: var(--accent-soft); color: var(--accent); padding: 2px 6px;
+    border-radius: 6px; font-size: .88em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .mermaid { text-align: center; margin: 16px 0; }
+  .live {
+    background: #0f172a; color: #e2e8f0; border-radius: 14px; padding: 26px 30px;
+  }
+  .live h2 { color: #fff; margin-top: 0; }
+  .live ul { margin: 0; padding-left: 20px; }
+  .live a { color: #a5b4fc; }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 24px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>A Jornada de um Pedido</h1>
+  <p>Da fundação (Docker, banco, fila, observabilidade) até o clique em "Comprar" atravessando uma arquitetura de microsserviços — cada conceito com o código real do laboratório.</p>
+  <span class="badge">Lab de Microsserviços · E-commerce</span>
+</header>
+
+<main>
+  <nav class="toc">
+    <h2>Roteiro da aula</h2>
+    <ol>
+      <li><a href="#f1">Docker — mini máquinas virtuais</a></li>
+      <li><a href="#f2">Docker Compose — a planta da loja</a></li>
+      <li><a href="#f3">PostgreSQL — o cofre dos dados</a></li>
+      <li><a href="#f4">RabbitMQ — o correio da loja</a></li>
+      <li><a href="#c0">Por que microsserviços?</a></li>
+      <li><a href="#c1">API Gateway — o porteiro</a></li>
+      <li><a href="#c2">Database-per-Service</a></li>
+      <li><a href="#c3">Síncrono + Circuit Breaker</a></li>
+      <li><a href="#c4">Assíncrono — os eventos</a></li>
+      <li><a href="#c5">Outbox — a promessa de entrega</a></li>
+      <li><a href="#c6">Saga e compensação</a></li>
+      <li><a href="#c7">Idempotência</a></li>
+      <li><a href="#c8">Contrato e versionamento</a></li>
+      <li><a href="#c9">Observabilidade — os 3 pilares</a></li>
+      <li><a href="#c10">Grafana &amp; Prometheus — as ferramentas</a></li>
+    </ol>
+  </nav>
+
+  <h3 class="part-title">Parte I — A fundação (a infraestrutura que sustenta a loja)</h3>
+
+  <section class="chapter" id="f1">
+    <h2><span class="num">F1</span>Docker — mini máquinas virtuais na sua máquina</h2>
+    <p class="sub">Imagine vários computadores separados rodando ao mesmo tempo DENTRO do seu computador — cada um com seus arquivos e programas, todos ligados por uma rede. É isso que o Docker cria.</p>
+    <div class="mermaid">
+flowchart TB
+  subgraph HOST["SEU COMPUTADOR (host)"]
+    subgraph NET["REDE DOCKER — todos se enxergam pelo nome"]
+      C1["container:<br/>catalog :5000"]
+      C2["container:<br/>order :5000"]
+      C3["container:<br/>postgres :5432"]
+      C4["container:<br/>rabbitmq :5672"]
+      C5["container:<br/>grafana :3000"]
+    end
+  end
+  C1 ---|"HTTP: http://catalog:5000"| C2
+  C2 --- C3
+  C2 --- C4
+    </div>
+    <p class="fig">Cada container é uma mini máquina virtual com endereço de rede próprio. No código, o "nome do computador" vira URL — é por isso que o order chama <code>http://catalog:5000</code>.</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg" alt="Docker" loading="lazy" style="height:90px; border:none; display:block; margin:14px auto;">
+    <div class="grid2">
+      <div class="card-inner"><h4>Mini máquinas virtuais</h4><p>Cada container tem seus próprios arquivos e processos, como um computador separado. Se um "queima" (bug, crash), os outros continuam rodando normalmente.</p></div>
+      <div class="card-inner"><h4>O Docker é o administrador</h4><p>É ele quem cria as mini-máquinas (<code>docker run</code>), liga e desliga, e conecta todas na mesma rede. Sem Docker, você instalaria cada serviço "à mão" na sua máquina — versões conflitando, bagunça.</p></div>
+      <div class="card-inner"><h4>Imagem = receita, container = máquina ligada</h4><p>A <strong>imagem</strong> é a receita (arquivos + instruções congeladas). O <strong>container</strong> é a mini-máquina criada a partir dela, rodando. Uma imagem pode gerar várias máquinas idênticas.</p></div>
+      <div class="card-inner"><h4>O problema que mata</h4><p>"Na minha máquina funciona." Cada serviço depende de versões de Python, bibliotecas, variáveis... Com Docker, o ambiente viaja junto com o código: roda igual em qualquer máquina.</p></div>
+    </div>
+    <span class="code-title">services/catalog/Dockerfile — a receita do serviço de catálogo</span>
+<pre class="file"><span class="k">FROM</span> python:3.10                     <span class="c"># base: Python já instalado</span>
+<span class="k">WORKDIR</span> /app
+<span class="k">COPY</span> shared/ /app/shared/           <span class="c"># a biblioteca comum entra na imagem</span>
+<span class="k">COPY</span> services/catalog/ /app/       <span class="c"># o código do serviço</span>
+<span class="k">RUN</span> pip install --no-cache-dir /app/shared &amp;&amp; pip install --no-cache-dir -r requirements.txt
+<span class="k">ENV</span> PYTHONPATH=/app:/app/shared
+<span class="k">EXPOSE</span> 5000
+<span class="k">CMD</span> [<span class="s">"python"</span>, <span class="s">"app.py"</span>]      <span class="c"># o que roda quando o container sobe</span></pre>
+    <span class="code-title"># na prática</span>
+<pre class="file">docker build -t catalog .          <span class="c"># constrói a imagem</span>
+docker run -p 5000:5000 catalog   <span class="c"># sobe UM container</span></pre>
+  </section>
+
+  <section class="chapter" id="f2">
+    <h2><span class="num">F2</span>Docker Compose — a planta da loja inteira</h2>
+    <p class="sub">No capítulo anterior, o Docker criava UMA mini máquina por vez (<code>docker run</code>). E quando a loja tem 12 máquinas? Digitar 12 comandos, na ordem certa, conectando uma na outra... É aí que entra o Docker Compose: você escreve num arquivo como a loja inteira deve ficar — e ele liga tudo de uma vez.</p>
+    <div class="mermaid">
+flowchart TB
+  PLAN["docker-compose.yml<br/>a planta da loja"] --> CMD["docker compose up -d<br/>(um único comando)"]
+  CMD --> PG["mini-PC:<br/>postgres"]
+  CMD --> RMQ["mini-PC:<br/>rabbitmq"]
+  CMD --> GF["mini-PC:<br/>grafana"]
+  CMD --> CAT["mini-PC:<br/>catalog"]
+  CMD --> ORD["mini-PC:<br/>order"]
+  PG -->|"healthy → libera"| CAT
+  PG -->|"healthy → libera"| ORD
+    </div>
+    <span class="code-title">docker-compose.yml — a planta: todas as mini máquinas declaradas</span>
+<pre class="file">services:                               <span class="c"># cada item = uma mini máquina a ser ligada</span>
+  postgres:  <span class="k">image</span>: postgres:15-alpine
+  rabbitmq:  <span class="k">image</span>: rabbitmq:3-management-alpine
+  grafana:   <span class="k">image</span>: grafana/grafana:11.0.0
+
+  catalog:                              <span class="c"># os nossos serviços (têm Dockerfile próprio)</span>
+    <span class="k">build</span>: { context: ., dockerfile: services/catalog/Dockerfile }
+    <span class="k">depends_on</span>:
+      postgres: { <span class="k">condition</span>: service_healthy }   <span class="c"># "só ligue depois que o banco estiver pronto"</span>
+    <span class="k">environment</span>:
+      POSTGRES_DB: catalog_db</pre>
+    <span class="code-title"># na prática</span>
+<pre class="file">docker compose up -d --build   <span class="c"># lê a planta e liga TODAS as mini-máquinas de uma vez</span>
+docker compose ps              <span class="c"># lista as máquinas ligadas e o estado de cada uma</span>
+docker compose logs -f order   <span class="c"># segue a "tela" de UMA máquina (o serviço order)</span>
+docker compose down -v         <span class="c"># desliga tudo e apaga os dados (voltar ao zero)</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>A planta da loja</h4><p>O <code>docker-compose.yml</code> descreve todas as mini-máquinas: qual receita (imagem) cada uma usa, portas, senhas, variáveis. Lendo o arquivo, você entende a loja inteira — é a documentação viva da infraestrutura.</p></div>
+      <div class="card-inner"><h4>Ligar na ordem certa</h4><p><code>depends_on</code> com <code>service_healthy</code> é o checklist de inicialização: "só ligue o catálogo depois que o banco disser <em>estou pronto</em>". O healthcheck é a pergunta "a máquina já está de pé?" que o Compose faz antes de ligar a próxima.</p></div>
+      <div class="card-inner"><h4>Rede pronta</h4><p>Todas as mini-máquinas nascem conectadas na mesma rede do capítulo anterior. Nenhum IP configurado à mão: o nome do serviço vira endereço — por isso o código chama <code>http://catalog:5000</code>.</p></div>
+      <div class="card-inner"><h4>Sobe tudo num comando</h4><p>Clonou o repositório? <code>docker compose up -d</code>. A loja inteira (bancos, filas, dashboards, serviços) nasce idêntica em qualquer máquina. Zero configuração manual.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f3">
+    <h2><span class="num">F3</span>PostgreSQL — o cofre dos dados (SQL)</h2>
+    <p class="sub">Os dados da loja têm FORMA. Um pedido tem id, status, total — sempre. Tabelas com colunas fixas, ligadas entre si por IDs: é isso que um banco relacional guarda.</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="PostgreSQL" loading="lazy" style="height:90px; border:none; display:block; margin:14px auto;">
+    <div class="mermaid">
+flowchart LR
+  subgraph REL["SQL — tabelas interligadas (colunas fixas)"]
+    direction TB
+    O["orders<br/>id | status | total"]
+    I["order_items<br/>order_id → orders"]
+    P["products<br/>id | name | price"]
+    O --- I --- P
+  end
+  subgraph DOC["NoSQL — documentos JSON (formato livre)"]
+    direction TB
+    D["{<br/>  pedido: { itens: [...], cliente: {...} }<br/>}"]
+  end
+    </div>
+    <table class="cmp">
+      <tr><th></th><th>SQL (PostgreSQL)</th><th>NoSQL (MongoDB, DynamoDB...)</th></tr>
+      <tr><td>Forma dos dados</td><td>Tabelas com colunas fixas e tipadas</td><td>Documentos JSON de formato livre</td></tr>
+      <tr><td>Esquema</td><td>Definido e validado pelo banco</td><td>Cada documento pode ter campos diferentes</td></tr>
+      <tr><td>Transações (ACID)</td><td>Sim — tudo ou nada</td><td>Limitadas ou ausentes</td></tr>
+      <tr><td>Relações</td><td>JOINs nativos do banco</td><td>Você resolve no código da aplicação</td></tr>
+      <tr><td>Crescer</td><td>Um servidor mais forte (vertical)</td><td>Muitas máquinas (horizontal)</td></tr>
+      <tr><td>Na nossa loja</td><td>order, payment, invoice — o dinheiro</td><td>catalog (DocumentDB) e cart (Redis) seriam ótimos</td></tr>
+    </table>
+    <div class="grid2">
+      <div class="card-inner"><h4>Dinheiro e estoque não podem errar</h4><p>Transação ACID = <strong>tudo ou nada</strong>. Pedido, pagamento e o evento do outbox (capítulo 05) nascem no MESMO commit — ou todos juntos, ou nenhum. É isso que sustenta a loja.</p></div>
+      <div class="card-inner"><h4>Dados interligados</h4><p>Pedido → itens → produtos → NF → entrega: no SQL, uma consulta com JOIN monta a história inteira. No NoSQL, você remontaria essas relações no código da aplicação.</p></div>
+      <div class="card-inner"><h4>Catálogo e carrinho? NoSQL seria até melhor</h4><p>O catálogo é leitura pesada com atributos variados — um <strong>DocumentDB</strong> encaixa perfeitamente (ainda mais depois de separar o estoque no inventory). O carrinho é efêmero e quente — <strong>Redis</strong> com TTL. Mantivemos tudo em Postgres só para o exemplo da aula ficar simples.</p></div>
+      <div class="card-inner"><h4>Ligando com o capítulo 02</h4><p>Aqui é a ferramenta; no capítulo 02 você vê o PADRÃO: por que cada serviço ter seu banco é regra de ouro em microsserviços.</p></div>
+    </div>
+    <span class="code-title">services/order/models.py — cada coluna nasce com TIPO fixo (esquema)</span>
+<pre class="file"><span class="k">class</span> <span class="n">Order</span>(Base):
+    __tablename__ = <span class="s">'orders'</span>
+    id = Column(Integer, primary_key=<span class="k">True</span>)
+    order_id = Column(String, unique=<span class="k">True</span>, nullable=<span class="k">False</span>)
+    total = Column(Numeric(10, 2), nullable=<span class="k">False</span>)   <span class="c"># número com 2 casas, SEMPRE</span>
+    status = Column(String, nullable=<span class="k">False</span>)</pre>
+    <span class="code-title">config/postgres/init.sql — os bancos nascem na primeira subida</span>
+<pre class="file"><span class="k">CREATE DATABASE</span> catalog_db;
+<span class="k">CREATE DATABASE</span> cart_db;
+<span class="k">CREATE DATABASE</span> order_db;
+<span class="k">CREATE DATABASE</span> payment_db;
+<span class="k">CREATE DATABASE</span> invoice_db;
+<span class="k">CREATE DATABASE</span> logistics_db;
+<span class="k">CREATE DATABASE</span> warranty_db;</pre>
+    <span class="code-title">docker-compose.yml — o banco com saúde monitorada</span>
+<pre class="file">postgres:
+  <span class="k">image</span>: postgres:15-alpine
+  <span class="k">healthcheck</span>:
+    <span class="k">test</span>: [<span class="s">"CMD-SHELL"</span>, <span class="s">"pg_isready -U admin -d messages_db"</span>]
+    <span class="k">interval</span>: 10s</pre>
+    <span class="code-title"># na prática — as relações viram perguntas simples (JOIN)</span>
+<pre class="file">docker compose exec postgres psql -U admin -d order_db -c \
+  <span class="s">"SELECT o.order_id, o.status, e.event_type, e.published
+     FROM orders o
+     JOIN outbox_events e ON e.aggregate_id = o.order_id;"</span></pre>
+  </section>
+
+  <section class="chapter" id="f4">
+    <h2><span class="num">F4</span>RabbitMQ — o correio da loja</h2>
+    <p class="sub">O message broker: serviços se comunicam por mensagens sem se conhecerem — como cartas num correio.</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg" alt="RabbitMQ" loading="lazy" style="height:90px; border:none; display:block; margin:14px auto;">
+    <div class="mermaid">
+flowchart LR
+  P["order<br/>produtor"] -->|"publica na exchange"| X{"exchange<br/>orders.events (topic)"}
+  X -->|"routing key order.paid"| Q1["invoice.order_paid"]
+  X -->|"routing key order.paid"| Q2["logistics.order_paid"]
+  X -->|"routing key order.rejected"| Q3["warranty.order_rejected"]
+    </div>
+    <span class="code-title">shared/lab_common/rabbitmq.py — declarando a topologia</span>
+<pre class="file">channel.exchange_declare(exchange=<span class="s">'orders.events'</span>, exchange_type=<span class="s">'topic'</span>, durable=<span class="k">True</span>)
+channel.queue_declare(queue=<span class="s">'invoice.order_paid'</span>, durable=<span class="k">True</span>, arguments={
+    <span class="s">'x-dead-letter-exchange'</span>: <span class="s">'logs_dlx'</span>,          <span class="c"># erro demais → DLQ</span>
+    <span class="s">'x-dead-letter-routing-key'</span>: <span class="s">'dead_letter'</span>,
+})
+channel.queue_bind(exchange=<span class="s">'orders.events'</span>, queue=<span class="s">'invoice.order_paid'</span>, routing_key=<span class="s">'order.paid'</span>)</pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>Os 3 tipos de exchange</h4><p><strong>Fanout</strong> (todos recebem — ex. mensagens), <strong>direct</strong> (um recebe — work queue), <strong>topic</strong> (filtro por routing key — nossos eventos <code>order.paid</code>/<code>order.rejected</code>).</p></div>
+      <div class="card-inner"><h4>Veja ao vivo</h4><p>RabbitMQ Management em <code>:15672</code>: exchanges, filas, mensagens prontas, DLQ — tudo inspecionável durante a aula.</p></div>
+    </div>
+  </section>
+
+  <h3 class="part-title">Parte II — A Jornada do Pedido (os padrões da loja)</h3>
+
+  <section class="chapter" id="c0">
+    <h2><span class="num">00</span>Por que microsserviços?</h2>
+    <p class="sub">Antes da jornada: a loja era um sistema único — o monólito.</p>
+    <div class="mermaid">
+flowchart LR
+  subgraph Mono["Monólito — uma aplicação"]
+    A["Tudo junto:<br/>catálogo, carrinho, pedidos,<br/>pagamento, estoque..."]
+    B[(1 banco)]
+  end
+  A --> B
+    </div>
+    <div class="grid2">
+      <div class="card-inner"><h4>O problema</h4><p>Um pico em "pagamentos" exige escalar a loja inteira. Um bug no carrinho derruba o catálogo. Todo deploy move tudo — e todos os times ao mesmo tempo.</p></div>
+      <div class="card-inner"><h4>A aposta</h4><p>Dividir a loja em serviços independentes: cada um com seu código, seu banco e seu ciclo de deploy. O preço: comunicação em rede, mais falhas possíveis — e novos padrões para domá-las.</p></div>
+    </div>
+    <img src="https://microservices.io/i/Microservice_Architecture.png" alt="Arquitetura de microsserviços" loading="lazy">
+    <p class="fig">Fonte: microservices.io — cada serviço tem seu próprio banco de dados.</p>
+    <span class="code-title"># estrutura do repositório (monorepo)</span>
+<pre class="file"><span class="c"># A loja dividida — e sobe tudo com UM comando: docker compose up -d</span>
+services/
+├── catalog/  cart/  order/  payment/   <span class="c"># APIs (fluxo síncrono)</span>
+├── invoice/  logistics/  warranty/     <span class="c"># workers (fluxo assíncrono)</span>
+└── messaging-demo/                     <span class="c"># exemplo legado (Pub/Sub vs Work Queue)</span>
+shared/lab_common/                      <span class="c"># biblioteca comum: logger, tracing, rabbitmq, http_client...</span>
+docker-compose.yml                      <span class="c"># infra + 8 serviços + gateway</span></pre>
+  </section>
+
+  <section class="chapter" id="c1">
+    <h2><span class="num">01</span>API Gateway — o porteiro da loja</h2>
+    <p class="sub">O cliente não conhece os serviços. Ele fala com UM endereço: <code>:8080</code>.</p>
+    <div class="mermaid">
+flowchart LR
+  C["Cliente / Postman"] --> G["Nginx Gateway :8080"]
+  G -->|/api/v1/catalogo/*| CAT[catalog]
+  G -->|/api/v1/carrinho/*| CART[cart]
+  G -->|/api/v1/pedidos/*| ORD[order]
+  G -->|/api/v1/pagamentos/*| PAY[payment]
+    </div>
+    <span class="code-title">config/nginx/nginx.conf</span>
+<pre class="file"><span class="c"># Rate limit global da API: 10 requisições/s (burst de 20)</span>
+<span class="k">limit_req_zone</span> $binary_remote_addr <span class="k">zone</span>=api:10m <span class="k">rate</span>=10r/s;
+
+<span class="c"># O RG do pedido: gerado na porta da loja e devolvido em toda resposta</span>
+<span class="k">add_header</span> X-Correlation-ID $request_id <span class="k">always</span>;
+
+<span class="c"># Roteia por caminho: /pedidos → serviço "order"</span>
+<span class="k">location</span> ~ ^/api/v1/pedidos/(.*)$ {
+    <span class="k">set</span> $backend order;
+    <span class="k">limit_req</span> <span class="k">zone</span>=api <span class="k">burst</span>=20 <span class="k">nodelay</span>;
+    <span class="k">proxy_pass</span> http://$backend:5000/$1$is_args$args;
+    <span class="k">proxy_set_header</span> X-Correlation-ID $request_id;
+}</pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>O que acontece aqui</h4><p>Roteamento por caminho, rate limit, e o carimbo de entrada: o <code>X-Correlation-ID</code> — gerado na porta e carregado por toda a jornada.</p></div>
+      <div class="card-inner"><h4>Por que importa</h4><p>Serviços internos mudam sem o cliente perceber. Segurança e política num ponto só. E o correlation ID vira a "cola" que rastreia o pedido do início ao fim.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c2">
+    <h2><span class="num">02</span>Database-per-Service — cada caixa tem sua contabilidade</h2>
+    <p class="sub">Nenhum serviço toca a tabela do outro. Nunca. Cada um tem o próprio banco.</p>
+    <div class="mermaid">
+flowchart LR
+  CAT[catalog] --> CDB[(catalog_db)]
+  CART[cart] --> KDB[(cart_db)]
+  ORD[order] --> ODB[(order_db)]
+  PAY[payment] --> PDB[(payment_db)]
+  INV[invoice] --> IDB[(invoice_db)]
+    </div>
+    <span class="code-title">config/postgres/init.sql — 1 database por serviço</span>
+<pre class="file"><span class="k">CREATE DATABASE</span> catalog_db;
+<span class="k">CREATE DATABASE</span> cart_db;
+<span class="k">CREATE DATABASE</span> order_db;
+<span class="k">CREATE DATABASE</span> payment_db;
+<span class="k">CREATE DATABASE</span> invoice_db;
+<span class="k">CREATE DATABASE</span> logistics_db;
+<span class="k">CREATE DATABASE</span> warranty_db;</pre>
+    <span class="code-title">docker-compose.yml — cada serviço aponta para o SEU banco</span>
+<pre class="file">catalog:
+  environment:
+    POSTGRES_DB: catalog_db    <span class="c"># o catalog só enxerga catalog_db</span>
+payment:
+  environment:
+    POSTGRES_DB: payment_db    <span class="c"># o payment só enxerga payment_db</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>A regra de ouro</h4><p>Se um serviço precisa de dados de outro, ele pede via API ou evento — nunca via banco. Acoplamento de banco é a receita do "monólito distribuído".</p></div>
+      <div class="card-inner"><h4>No lab</h4><p>7 bancos num único PostgreSQL (separação lógica, barata para ensinar). Em produção cada um voaria no seu próprio servidor.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c3">
+    <h2><span class="num">03</span>Comunicação síncrona — e o disjuntor (Circuit Breaker)</h2>
+    <p class="sub">Quando o pedido precisa da resposta AGORA (preço, estoque), a chamada é direta. E direta pode falhar.</p>
+    <div class="mermaid">
+flowchart LR
+  ORD[order] -->|"GET /carts/:id"| CART[cart]
+  ORD -->|"POST reserve"| CAT[catalog]
+  ORD -->|"POST /payments"| PAY[payment]
+  CART -->|"GET /products/:id"| CAT
+    </div>
+    <span class="code-title">shared/lab_common/http_client.py — o disjuntor, por serviço de destino</span>
+<pre class="file"><span class="k">def</span> <span class="n">_breaker_for</span>(self, url, fail_max, reset_timeout):
+    host = urlparse(url).netloc          <span class="c"># ex.: "payment:5000"</span>
+    <span class="k">if</span> host <span class="k">not in</span> self._breakers:
+        self._breakers[host] = pybreaker.CircuitBreaker(
+            fail_max=3,          <span class="c"># 3 falhas seguidas → circuito ABRE</span>
+            reset_timeout=30,    <span class="c"># 30s de folga, depois testa 1 chamada</span>
+            name=<span class="s">f"http:{host}"</span>,
+        )
+    <span class="k">return</span> self._breakers[host]</pre>
+    <span class="code-title">shared/lab_common/http_client.py — a chamada protegida</span>
+<pre class="file"><span class="k">@breaker</span>
+<span class="k">def</span> <span class="n">_do</span>():
+    headers = {}
+    propagate.inject(headers)            <span class="c"># W3C Trace Context (traceparent)</span>
+    cid = get_correlation_id()
+    <span class="k">if</span> cid:
+        headers[<span class="s">'X-Correlation-ID'</span>] = cid   <span class="c"># o RG do pedido viaja junto</span>
+    r = requests.request(method, url, json=json, timeout=2, headers=headers)
+    <span class="k">if</span> r.status_code &gt;= 500:
+        <span class="k">raise</span> Exception(<span class="s">f"HTTP {r.status_code}"</span>)   <span class="c"># conta como falha</span>
+    <span class="k">return</span> r</pre>
+    <img src="https://martinfowler.com/bliki/images/circuitBreaker/state.png" alt="Estados do Circuit Breaker" loading="lazy">
+    <p class="fig">Fonte: martinfowler.com — fechado (normal) → aberto (falha rápida) → meio-aberto (testando).</p>
+    <div class="grid2">
+      <div class="card-inner"><h4>O disjuntor</h4><p>Depois de 3 falhas seguidas num destino, o circuito ABRE: as próximas chamadas falham na hora (503), sem esperar timeout. A cada 30s, uma chamada de teste passa — se funcionar, fecha de novo.</p></div>
+      <div class="card-inner"><h4>Por que importa</h4><p>Sem disjuntor, um serviço lento derruba o outro — e a lentidão vira efeito dominó em toda a loja (o "cascading failure").</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c4">
+    <h2><span class="num">04</span>Comunicação assíncrona — os motoboys (eventos)</h2>
+    <p class="sub">Nem tudo precisa de resposta imediata. Emitir NF, agendar entrega, registrar garantia... acontecem DEPOIS.</p>
+    <div class="mermaid">
+flowchart LR
+  ORD[order] -->|order.paid| RMQ{RabbitMQ<br/>topic orders.events}
+  RMQ -->|order.paid| INV[invoice-worker]
+  RMQ -->|order.paid| LOG[logistics-worker]
+  RMQ -->|order.paid| WAR[warranty-worker]
+    </div>
+    <span class="code-title">services/order/app.py — "pedido pago" vira evento no outbox</span>
+<pre class="file">o.status = <span class="s">'PAID'</span>
+_append_outbox(s, order_id, <span class="s">'order.paid'</span>, <span class="s">'order.paid'</span>,
+    {<span class="s">'orderId'</span>: order_id, <span class="s">'total'</span>: total, <span class="s">'items'</span>: items, ...})</pre>
+    <span class="code-title">services/invoice/worker.py — quem se importa, assina o tópico</span>
+<pre class="file">rabbitmq_service.declare_topic_exchange(<span class="s">'orders.events'</span>, [
+    {<span class="s">'name'</span>: <span class="s">'invoice.order_paid'</span>, <span class="s">'routing_keys'</span>: [<span class="s">'order.paid'</span>], ...}
+])
+run_worker(<span class="s">'invoice'</span>, <span class="s">'invoice.order_paid'</span>, handler, ...)</pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>Padrão</h4><p>O order publica um EVENTO ("pedido foi pago!") e volta ao trabalho. Quem se importa, assina o tópico. Ninguém espera ninguém.</p></div>
+      <div class="card-inner"><h4>Por que importa</h4><p>Desacopla: um novo serviço (e-mail, por exemplo) entra só assinando o tópico — sem tocar no order. E o pico de um não contamina o outro.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c5">
+    <h2><span class="num">05</span>Outbox — a promessa de entrega</h2>
+    <p class="sub">O pesadelo: o pedido salva no banco, mas o evento se perde no caminho. Como garantir que os dois acontecem JUNTOS?</p>
+    <div class="mermaid">
+flowchart LR
+  subgraph TX["MESMA transação no order_db"]
+    O[Pedido PAID] --> OUT[("tabela outbox:<br/>evento não publicado")]
+  end
+  OUT --> R[relay a cada 1s]
+  R -->|publica| RMQ{RabbitMQ}
+  R -->|"✔ marca published"| OUT
+    </div>
+    <span class="code-title">services/order/models.py — a tabela que guarda a promessa</span>
+<pre class="file"><span class="k">class</span> <span class="n">OutboxEvent</span>(Base):
+    __tablename__ = <span class="s">'outbox_events'</span>
+    ...
+    payload = Column(Text, nullable=<span class="k">False</span>)
+    published = Column(Boolean, default=<span class="k">False</span>, index=<span class="k">True</span>)
+    published_at = Column(DateTime, nullable=<span class="k">True</span>)</pre>
+    <span class="code-title">services/order/app.py — gravar juntos; publicar depois</span>
+<pre class="file"><span class="c"># 1. O evento é gravado NA MESMA transação do pedido (tudo ou nada)</span>
+o.status = <span class="s">'PAID'</span>
+_append_outbox(s, order_id, <span class="s">'order.paid'</span>, <span class="s">'order.paid'</span>, {...})
+s.commit()   <span class="c"># pedido + evento: os dois commitam, ou nenhum</span>
+
+<span class="c"># 2. O relay (thread em background) entrega depois, a cada 1s:</span>
+pending = s.query(OutboxEvent).filter(OutboxEvent.published == <span class="k">False</span>)...
+<span class="k">for</span> ev <span class="k">in</span> pending:
+    rabbitmq_service.publish(payload, correlation_id=..., exchange=<span class="s">'orders.events'</span>)
+    ev.published = <span class="k">True</span>   <span class="c"># só marca depois que o broker confirmou</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>A sacada</h4><p>O evento NÃO vai direto ao broker. Ele é gravado numa tabela <code>outbox</code> na mesma transação do pedido — os dois commitam ou os dois caem. Depois, um relay entrega com retry até o broker confirmar.</p></div>
+      <div class="card-inner"><h4>Garantia</h4><p>At-least-once: o evento nunca se perde; no pior caso chega duas vezes. E é aí que entra a idempotência...</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c6">
+    <h2><span class="num">06</span>Saga e compensação — o estorno</h2>
+    <p class="sub">E se o pagamento falhar no meio do caminho? Alguém precisa desfazer o que já foi feito.</p>
+    <div class="mermaid">
+flowchart TD
+  A[1. Reserva estoque] --> B[2. Cobra pagamento]
+  B -->|aprovado| C[3. Publica order.paid]
+  B -->|recusado| D[4. Compensa: devolve estoque +<br/>publica order.rejected]
+  D --> E[workers cancelam logística/garantia]
+    </div>
+    <span class="code-title">services/order/app.py — reserva com compensação imediata</span>
+<pre class="file"><span class="k">def</span> <span class="n">_reserve_stock</span>(items):
+    reserved = []
+    <span class="k">for</span> it <span class="k">in</span> items:
+        <span class="k">try</span>:
+            hc.call(<span class="s">f'{CATALOG_URL}/products/{pid}/reserve'</span>, <span class="k">method</span>=<span class="s">'POST'</span>, ...)
+            reserved.append((pid, qty))
+        <span class="k">except</span> Exception <span class="k">as</span> e:
+            <span class="c"># falhou no meio → DESFAZ o que já tinha reservado</span>
+            <span class="k">for</span> (rpid, rqty) <span class="k">in</span> reserved:
+                hc.call(<span class="s">f'{CATALOG_URL}/products/{rpid}/release'</span>, <span class="k">method</span>=<span class="s">'POST'</span>, ...)
+            <span class="k">raise</span></pre>
+    <span class="code-title">services/order/app.py — pagamento recusado: compensa + evento no MESMO commit</span>
+<pre class="file">o.status = <span class="s">'REJECTED'</span>
+_release_stock(items)                    <span class="c"># devolve o estoque (compensação)</span>
+_append_outbox(s, order_id, <span class="s">'order.rejected'</span>, <span class="s">'order.rejected'</span>,
+    {<span class="s">'orderId'</span>: order_id, <span class="s">'status'</span>: <span class="s">'REJECTED'</span>, ...})
+s.commit()  <span class="c"># rejeição + evento: atômicos — o aviso aos workers nunca se perde</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>Saga</h4><p>Uma transação longa, distribuída, executada em passos por serviços diferentes — com uma história para cada desfecho.</p></div>
+      <div class="card-inner"><h4>Compensação</h4><p>Não dá pra dar "rollback" em outro banco. Então cada passo tem seu inverso: reservou estoque → devolve. Emitiu NF de pedido pago → só se foi pago mesmo. O evento <code>order.rejected</code> avisa os workers.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c7">
+    <h2><span class="num">07</span>Idempotência — nada acontece duas vezes</h2>
+    <p class="sub">Retries existem. Rede falha. Mensagens chegam de novo. A loja precisa sobreviver a isso.</p>
+    <span class="code-title">services/invoice/worker.py — NF nunca é emitida duas vezes</span>
+<pre class="file"><span class="k">def</span> <span class="n">handler</span>(data, correlation_id, span):
+    order_id = data.get(<span class="s">'orderId'</span>)
+    <span class="c"># Idempotência durável: se já existe NF deste pedido, não faz nada</span>
+    <span class="k">if</span> s.query(Invoice).filter(Invoice.order_id == order_id).first():
+        <span class="k">return</span>
+    inv = Invoice(invoice_id=str(uuid.uuid4()), order_id=order_id, total=total)
+    s.add(inv); s.commit()</pre>
+    <span class="code-title">shared/lab_common/worker.py — primeira barreira: o correlationId</span>
+<pre class="file"><span class="k">if</span> correlation_id <span class="k">in</span> processed_cache:
+    logger.warning(<span class="s">"Idempotency: duplicate dropped."</span>, extra={...})
+    ch.basic_ack(delivery_tag=method.delivery_tag)   <span class="c"># reconhece e descarta</span>
+    <span class="k">return</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>A regra</h4><p>Toda operação de "efeito" precisa poder rodar 2x com o mesmo resultado: checar antes de inserir, usar IDs de negócio (correlationId/orderId) como chave.</p></div>
+      <div class="card-inner"><h4>No lab</h4><p>Workers conferem <code>correlationId</code> antes de processar; o invoice só emite NF se não existir uma para aquele <code>order_id</code> (constraint UNIQUE + upsert).</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c8">
+    <h2><span class="num">08</span>Contrato e versionamento — o cardápio da loja</h2>
+    <p class="sub">Serviços independentes só se entendem se o "cardápio" é claro e combinado.</p>
+    <span class="code-title">services/catalog/schemas.py — o contrato declarado</span>
+<pre class="file"><span class="k">class</span> <span class="n">ProductIn</span>(Schema):
+    name = fields.String(required=<span class="k">True</span>, description=<span class="s">"Nome do produto"</span>)
+    price = fields.Number(required=<span class="k">True</span>, description=<span class="s">"Preço"</span>)
+    stock = fields.Integer(required=<span class="k">False</span>, load_default=0)
+    extendedWarrantyEligible = fields.Boolean(required=<span class="k">False</span>, load_default=<span class="k">False</span>)</pre>
+    <span class="code-title">services/catalog/app.py — validação na porta de entrada</span>
+<pre class="file"><span class="k">@app.post</span>(<span class="s">'/products'</span>)
+<span class="k">@app.input</span>(ProductIn)          <span class="c"># payload inválido → 422 antes de entrar no serviço</span>
+<span class="k">def</span> <span class="n">create_product</span>(json_data):
+    ...</pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>Validação de contrato</h4><p>Todo payload é validado na entrada (marshmallow/apiflask): tipo, obrigatoriedade, formato. Dado errado nem entra no serviço.</p></div>
+      <div class="card-inner"><h4>Versionamento</h4><p>URLs versionadas (<code>/api/v1/...</code>) + OpenAPI gerado por serviço e consolidado no ReDoc/Swagger: a documentação É o contrato.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c9">
+    <h2><span class="num">09</span>Observabilidade — os 3 pilares em ação</h2>
+    <p class="sub">Com 8+ serviços, "cadê o pedido?" precisa de resposta em segundos, não em horas.</p>
+    <div class="mermaid">
+flowchart LR
+  S[serviços] -->|logs JSON| L[Loki]
+  S -->|/metrics| P[Prometheus]
+  S -->|traces OTLP| T[Tempo]
+  L --> G[Grafana]
+  P --> G
+  T --> G
+    </div>
+    <span class="code-title">shared/lab_common/logger.py — toda linha carrega os fios condutores</span>
+<pre class="file"><span class="k">class</span> <span class="n">OtelContextFilter</span>(logging.Filter):
+    <span class="k">def</span> <span class="n">filter</span>(self, record):
+        span = trace.get_current_span()
+        record.traceId = format(ctx.trace_id, <span class="s">"032x"</span>)   <span class="c"># técnico (W3C)</span>
+        record.spanId = format(ctx.span_id, <span class="s">"016x"</span>)
+        record.correlationId = get_correlation_id()       <span class="c"># negócio (gateway)</span>
+        <span class="k">return</span> <span class="k">True</span></pre>
+    <span class="code-title">config/loki/promtail-config.yaml — promovendo os campos que importam</span>
+<pre class="file">- structured_metadata:
+    correlationId:
+    traceId:
+    loggerName:</pre>
+    <span class="code-title">no Grafana (Explore → Loki) — todos os logs de UM pedido</span>
+<pre class="file">{job=<span class="s">"dockerlogs"</span>, is_app=<span class="s">"true"</span>} | json | correlationId=<span class="s">"SEU-ID"</span></pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>Os três pilares</h4><p><strong>Logs</strong> (Loki): o que aconteceu. <strong>Métricas</strong> (Prometheus): quantos/quão rápido. <strong>Traces</strong> (Tempo): o caminho completo do pedido, span a span.</p></div>
+      <div class="card-inner"><h4>Os dois fios condutores</h4><p><code>traceId</code> (técnico, W3C Trace Context) e <code>correlationId</code> (negócio): com qualquer um, você acha TODOS os registros de um pedido — do gateway aos workers.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c10">
+    <h2><span class="num">10</span>Grafana &amp; Prometheus — as ferramentas por dentro</h2>
+    <p class="sub">Você já viu o que os 3 pilares capturam (capítulo 09). Agora o COMO: Grafana e Prometheus estão instalados e provisionados na loja desde a primeira subida.</p>
+    <div class="logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Grafana_icon.svg" alt="Grafana" loading="lazy">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Prometheus_software_logo.svg" alt="Prometheus" loading="lazy">
+    </div>
+    <div class="grid2">
+      <div class="card-inner"><h4>Prometheus (métricas)</h4><p>Cada serviço expõe <code>/metrics</code> (contadores de requests, pedidos, erros...). O Prometheus "raspa" (scrape) a cada 5s e guarda a série temporal.</p></div>
+      <div class="card-inner"><h4>Grafana (a vitrine)</h4><p>Lê Prometheus, Loki e Tempo. Dashboards e datasources já vêm provisionados: sobe a stack e os gráficos estão lá.</p></div>
+    </div>
+    <span class="code-title">config/prometheus/prometheus.yml — quem o Prometheus raspa</span>
+<pre class="file">scrape_configs:
+  - <span class="k">job_name</span>: <span class="s">'order'</span>
+    <span class="k">static_configs</span>:
+      - <span class="k">targets</span>: [<span class="s">'order:5000'</span>]      <span class="c"># GET /metrics de cada serviço</span>
+  - <span class="k">job_name</span>: <span class="s">'rabbitmq'</span>
+    <span class="k">metrics_path</span>: /metrics/per-object
+    <span class="k">static_configs</span>:
+      - <span class="k">targets</span>: [<span class="s">'rabbitmq:15692'</span>]</pre>
+    <span class="code-title">config/grafana/provisioning/datasources/prometheus.yml — o Grafana já nasce sabendo ler</span>
+<pre class="file">datasources:
+  - <span class="k">name</span>: Prometheus
+    <span class="k">type</span>: prometheus
+    <span class="k">url</span>: http://prometheus:9090</pre>
+    <div class="grid2">
+      <div class="card-inner"><h4>No compose</h4><p><code>loki</code> (logs, :3100), <code>prometheus</code> (:9090), <code>tempo</code> (traces, :3200/:4317) e <code>grafana</code> (:3000) sobem junto da loja — e todos falam entre si por provisionamento automático, não por configuração manual.</p></div>
+      <div class="card-inner"><h4>Retomando o capítulo 09</h4><p>Lá você viu o QUE as câmeras capturam (logs, métricas, traces). Aqui, as câmeras em si: onde ficam os arquivos de scrape, provisioning e como tudo nasce pronto.</p></div>
+    </div>
+  </section>
+
+  <section class="live">
+    <h2>Veja ao vivo (stack rodando)</h2>
+    <ul>
+      <li><a href="http://localhost:8080/docs">ReDoc</a> — documentação combinada de toda a API</li>
+      <li><a href="http://localhost:8080/docs/swagger.html">Swagger UI</a> — com Try it out</li>
+      <li><a href="http://localhost:3000">Grafana</a> — dashboard "E-commerce Microservices" (métricas) e Explore (logs/traces)</li>
+      <li><a href="http://localhost:3000/explore?schemaVersion=1&panes=%7B%22dy3%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7B%20resource.service.name%20%3D%20%22order-service%22%20%26%26%20name%20%3D%20%22POST%20/orders%22%20%7D%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-1h%22%2C%22to%22%3A%22now%22%7D%7D%7D&orgId=1">Tempo (Explore)</a> — o trace completo de um pedido</li>
+      <li><a href="http://localhost:15672">RabbitMQ Management</a> — filas e mensagens</li>
+    </ul>
+  </section>
+</main>
+
+<footer>Lab de Microsserviços · A Jornada de um Pedido · feito para aula</footer>
+
+<script>mermaid.initialize({ startOnLoad: true, theme: "default", flowchart: { curve: "basis" } });</script>
+</body>
+</html>
